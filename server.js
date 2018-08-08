@@ -46,10 +46,10 @@ server.post('/api/login', (req, res) => {
 
 server.get('/api/restricted/users', (req, res) => {
   const { authorization } = req.headers;
-  jwt.verify(authorization.slice(7), 'kam-secret-007', (verdict) => {
-    if (verdict) {
+  jwt.verify(authorization.slice(7), 'kam-secret-007', (err, decoded) => {
+    if (!err) {
       db('users')
-        .select('usernames')
+        .select('username')
         .then((usernames) => {
           return res.status(200).json(usernames);
         })
