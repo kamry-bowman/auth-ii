@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import Authorization from './components/Authorization';
+import UserList from './components/UserList';
+
 import logo from './logo.svg';
 import './App.css';
 
@@ -13,7 +16,7 @@ class App extends Component {
         <Authorization>
           <UserList>
             <h2>List of Users</h2>
-            {this.state.users.map(user => (<li key={ user.id }>{ user.username }</li>))}
+            {(users) => users.map(user => (<li key={ user.id }>{ user.username }</li>))}
           </UserList>
         </Authorization>
       </div>

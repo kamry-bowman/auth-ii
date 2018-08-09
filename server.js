@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv').config();
+const cors = require('cors');
 const db = require('knex')(require('./knexfile').development);
 
 const host = process.env.HOST || 'localhost';
@@ -12,6 +13,7 @@ const secret = process.env.SECRET || 'secretWithSevenSssssss';
 const server = express();
 server.use(express.json());
 server.use(morgan('dev'));
+server.use(cors({ credentials: true }));
 
 function authenticate(req, res, next) {
   const { authorization: token } = req.headers;
@@ -64,7 +66,9 @@ server.post('/api/login', (req, res) => {
 });
 
 server.get('/api/restricted/authenticate', (req, res) => {
-  const { authorization } = req.headers;
+  if (req.locals.authorization) {
+    res.status(200).json(req.locals.authorization);
+  }
 });
 
 server.get('/api/restricted/users', (req, res) => {
