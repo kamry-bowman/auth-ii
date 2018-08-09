@@ -2,7 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv').config();
 const db = require('knex')(require('./knexfile').development);
 
 const host = process.env.HOST || 'localhost';
@@ -12,6 +12,20 @@ const secret = process.env.SECRET || 'secretWithSevenSssssss';
 const server = express();
 server.use(express.json());
 server.use(morgan('dev'));
+
+function authenticate(req, res, next) {
+  const { authorization: token } = req.headers;
+  jwt.verify(token, secret, (err, decoded) => {
+    if (err) {
+      res.status(401).json({ message: 'Authentication failed.'});
+    } else {
+      req.locals = { authorization: decoded };
+      next();
+    }
+  })
+}
+
+server.use('/api/restricted/', authenticate);
 
 server.post('/api/register', (req, res) => {
   const { username, password } = req.body;
@@ -49,23 +63,20 @@ server.post('/api/login', (req, res) => {
     });
 });
 
-server.get('/api/restricted/users', (req, res) => {
+server.get('/api/restricted/authenticate', (req, res) => {
   const { authorization } = req.headers;
-  jwt.verify(authorization, secret, (err, decoded) => {
-    if (!err) {
-      db('users')
-        .select('username')
-        .then((usernames) => {
-          return res.status(200).json(usernames);
-        })
-        .catch((err) => {
-          console.log(`Error: ${err}`);
-          return res.status(500).json({ message: 'Could not obtain requested data' });
-        })
-    } else {
-      res.status(406).json({ message: 'System could not log user in.' });
-    }
-  });
+});
+
+server.get('/api/restricted/users', (req, res) => {
+  db('users')
+    .select('username', 'id')
+    .then((usernames) => {
+      return res.status(200).json(usernames);
+    })
+    .catch((err) => {
+      console.log(`Error: ${err}`);
+      return res.status(500).json({ message: 'Could not obtain requested data' });
+    });
 });
 
 server.listen(port, () => {
