@@ -2,7 +2,12 @@ const express = require('express');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
 const db = require('knex')(require('./knexfile').development);
+
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || 8000;
+const secret = process.env.SECRET || 'secretWithSevenSssssss';
 
 const server = express();
 server.use(express.json());
@@ -14,7 +19,7 @@ server.post('/api/register', (req, res) => {
     .hash(password, 12)
     .then(hash => db('users').insert({ username, hash }))
     .then((id) => {
-      const token = jwt.sign({ username }, 'kam-secret-007', { expiresIn: '24h' });
+      const token = jwt.sign({ username }, secret, { expiresIn: '24h' });
       res.status(200).json(token);
     })
     .catch((err) => {
@@ -32,7 +37,7 @@ server.post('/api/login', (req, res) => {
     .then(({ hash }) => bcrypt.compare(password, hash))
     .then((verdict) => {
       if (verdict) {
-        const token = jwt.sign({ username }, 'kam-secret-007', { expiresIn: '24h' });
+        const token = jwt.sign({ username }, secret, { expiresIn: '24h' });
         res.status(200).json(token);
       } else {
         res.status(406).json({ message: 'System could not log user in.' });
@@ -46,7 +51,7 @@ server.post('/api/login', (req, res) => {
 
 server.get('/api/restricted/users', (req, res) => {
   const { authorization } = req.headers;
-  jwt.verify(authorization.slice(7), 'kam-secret-007', (err, decoded) => {
+  jwt.verify(authorization, secret, (err, decoded) => {
     if (!err) {
       db('users')
         .select('username')
@@ -63,6 +68,6 @@ server.get('/api/restricted/users', (req, res) => {
   });
 });
 
-server.listen(8000, () => {
-  console.log('Listening on 8000');
+server.listen(port, () => {
+  console.log(`Listening on ${port}`);
 });
