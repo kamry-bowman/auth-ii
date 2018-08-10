@@ -14,6 +14,7 @@ export default class Authorization extends Component {
     this.state = {
       authorized: false,
     }
+    this.attemptAuthentication = this.attemptAuthentication.bind(this);
   }
 
   attemptAuthentication() {
@@ -36,6 +37,8 @@ export default class Authorization extends Component {
   
   render() {
     const { authorized } = this.state;
-  return authorized ? this.props.children : (<Login attemptAuthentication={this.attemptAuthentication} api={ this.api } />);
+  return authorized  
+  ? React.Children.map(this.props.children, child => React.cloneElement(child, {api: this.api})) 
+  : (<Login attemptAuthentication={this.attemptAuthentication} api={ this.api } />);
   }
 }

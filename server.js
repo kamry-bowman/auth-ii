@@ -16,7 +16,7 @@ server.use(morgan('dev'));
 server.use(cors({ credentials: true }));
 
 function authenticate(req, res, next) {
-  const { authorization: token } = req.headers;
+  const { authentication: token } = req.headers;
   jwt.verify(token, secret, (err, decoded) => {
     if (err) {
       res.status(401).json({ message: 'Authentication failed.'});
@@ -50,7 +50,9 @@ server.post('/api/login', (req, res) => {
     .select('hash')
     .where('username', '=', username)
     .first()
-    .then(({ hash }) => bcrypt.compare(password, hash))
+    .then(({ hash }) => {
+      return bcrypt.compare(password, hash)
+    })
     .then((verdict) => {
       if (verdict) {
         const token = jwt.sign({ username }, secret, { expiresIn: '24h' });

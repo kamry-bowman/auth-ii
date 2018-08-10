@@ -20,23 +20,30 @@ export default class extends Component {
   attemptLogin = () => {
     const { api } = this.props;
     const { username, password } = this.state;
-    axios
+    return new Promise((resolve, reject) => {
+      axios
       .post(`${api}/login`, { username: username, password: password })
       .then((res) => {
-        return res.data && window.localStorage.setItem('jwt', res.data);
+        if (res.data) {
+          resolve(window.localStorage.setItem('jwt', res.data));
+        } else {
+          reject('Could not log in');
+        } 
       })
       .catch((err) => {
         console.log(err);
         throw err;
       });
+    }); 
   }
 
-  handleSubmit = async (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
+    const attemptAuthenticationLocal = this.props.attemptAuthentication;
     this
       .attemptLogin()
       .then((res) => {
-        return this.props.attemptAuthenticate();
+        attemptAuthenticationLocal();
       })
       .catch((err) => {
         console.log(err);

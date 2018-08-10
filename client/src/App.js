@@ -15,8 +15,9 @@ class App extends Component {
         </header>
         <Authorization>
           <UserList>
-            <h2>List of Users</h2>
-            {(users) => users.map(user => (<li key={ user.id }>{ user.username }</li>))}
+            { (users) => {
+              return users.map(user => (<li key={ user.id }>{ user.username }</li>)) }
+             }
           </UserList>
         </Authorization>
       </div>
