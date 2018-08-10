@@ -15,8 +15,14 @@ class App extends Component {
         </header>
         <Authorization>
           <UserList>
-            { (users) => {
-              return users.map(user => (<li key={ user.id }>{ user.username }</li>)) }
+             { users => (
+               <React.Fragment>
+                <h2>User List</h2>
+                <ol>
+                  { users.map(user => (<li key={ user.id }>{ user.username }</li>)) }
+                </ol>
+              </React.Fragment>
+              )
              }
           </UserList>
         </Authorization>
