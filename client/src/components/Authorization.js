@@ -12,9 +12,10 @@ export default class Authorization extends Component {
     super(props);
     this.api = `http://${host}:${port}/api`;
     this.state = {
-      authorized: false,
+      authenticated: false,
     }
     this.attemptAuthentication = this.attemptAuthentication.bind(this);
+    this.revokeAuthentication = this.revokeAuthentication.bind(this);
   }
 
   attemptAuthentication() {
@@ -23,7 +24,7 @@ export default class Authorization extends Component {
       axios
         .get(`${this.api}/restricted/authenticate`, { headers: { authentication } })
         .then((res) => {
-            this.setState({ authorized: true });
+            this.setState({ authenticated: true });
         })
         .catch((err) => {
           console.log(err);
@@ -31,14 +32,22 @@ export default class Authorization extends Component {
     } 
   }
 
+  revokeAuthentication() {
+    this.setState({
+      authenticated: false,
+    });
+  }
+
   componentDidMount() {
     this.attemptAuthentication();
   }
   
   render() {
-    const { authorized } = this.state;
-  return authorized  
-  ? React.Children.map(this.props.children, child => React.cloneElement(child, {api: this.api})) 
+    const { authenticated } = this.state;
+    const { revokeAuthentication, api } = this;
+    const authenticationProps = { revokeAuthentication, api };
+  return authenticated  
+  ? React.Children.map(this.props.children, child => React.cloneElement(child, authenticationProps)) 
   : (<Login attemptAuthentication={this.attemptAuthentication} api={ this.api } />);
   }
 }

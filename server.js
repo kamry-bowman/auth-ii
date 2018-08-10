@@ -24,7 +24,7 @@ function authenticate(req, res, next) {
       req.locals = { authorization: decoded };
       next();
     }
-  })
+  });
 }
 
 server.use('/api/restricted/', authenticate);

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Authorization from './components/Authorization';
+import Logout from './components/Logout'
 import UserList from './components/UserList';
 
 import logo from './logo.svg';
@@ -14,6 +15,7 @@ class App extends Component {
           <h1 className="App-title">Welcome to React</h1>
         </header>
         <Authorization>
+          <Logout />
           <UserList>
              { users => (
                <React.Fragment>
