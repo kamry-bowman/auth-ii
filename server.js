@@ -35,8 +35,7 @@ server.post('/api/register', (req, res) => {
     .hash(password, 12)
     .then(hash => db('users').insert({ username, hash }))
     .then((id) => {
-      const token = jwt.sign({ username }, secret, { expiresIn: '24h' });
-      res.status(200).json(token);
+      res.status(200).json(username);
     })
     .catch((err) => {
       console.log('An error occurred', err);
