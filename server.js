@@ -13,7 +13,7 @@ const secret = process.env.SECRET || 'secretWithSevenSssssss';
 const server = express();
 server.use(express.json());
 server.use(morgan('dev'));
-server.use(cors({ credentials: true }));
+server.use(cors());
 
 function authenticate(req, res, next) {
   const { authentication: token } = req.headers;

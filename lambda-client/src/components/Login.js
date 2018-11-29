@@ -28,10 +28,7 @@ export default class Login extends Component {
       .then((res) => {
         if (res.status === 200 && res.data) {
           localStorage.setItem('secret_bitcoin_token', res.data);
-          this.setState({
-            message: 'Login successful',
-            user: { ...initialUser },
-          });
+          this.props.history.push('/');
         } else {
           throw new Error();
         }
